@@ -1,0 +1,32 @@
+{% extends 'master.html' %}
+    {% block title %} وظایف {% endblock %}
+    {% block css %} static/css/styles.css{% endblock %}
+{% block content %}
+    <header>
+        <h1>مدیریت وظایف</h1>
+        <nav>
+            <ul>
+                <li><a href="#">صفحه اصلی</a></li>
+
+                {% if request.user.is_authenticated %}
+                <li><a href="#">پروژه‌ها</a></li>
+                <li><a href="{% url 'logout' %}">خروج</a></li>
+                {% else %}
+                <li><a href="{% url 'signin' %}">ورود</a></li>
+                <li><a href='{% url 'signup' %}'>ثبت نام</a></li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>به سیستم مدیریت وظایف خوش آمدید!</h2>
+        <p>این سیستم به شما کمک می‌کند پروژه‌های خود را مدیریت کنید و وظایف خود را به‌راحتی دنبال نمایید.</p>
+        <a href="#" class="btn">شروع کنید</a>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 مدیریت وظایف</p>
+    </footer>
+{% endblock %}

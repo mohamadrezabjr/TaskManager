@@ -1,0 +1,45 @@
+
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}لیست پروژه‌ها{% endblock %}
+{% block css %}{% static 'css/styles.css' %}{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>لیست پروژه‌ها</h1>
+
+    <div class="flex justify-end mb-4">
+        <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded">افزودن پروژه جدید</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 border rounded shadow-md" v-for="project in projects">
+            <h2>{{ project.title }}</h2>
+            <p class="text-gray-600 my-2">{{ project.description }}</p>
+            <div class="flex justify-between mt-4">
+                <a href="#" class="bg-green-500 text-white py-1 px-3 rounded">ویرایش</a>
+                <a href="#" class="bg-red-500 text-white py-1 px-3 rounded">حذف</a>
+            </div>
+        </div>
+    </div>
+
+    <h1>مدیریت وظایف</h1>
+
+    <div class="flex justify-end mb-4">
+        <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded">افزودن وظیفه جدید</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 border rounded shadow-md" v-for="task in tasks">
+            <h2>{{ task.title }}</h2>
+            <p class="text-gray-600 my-2">{{ task.description }}</p>
+{#            <p class="text-sm {{ 'text-green-500' if task.status == 'completed' else 'text-yellow-500' if task.status == 'in_progress' else 'text-red-500' }}">#}
+                {{ task.status }}
+            </p>
+            <div class="flex justify-between mt-4">
+                <a href="#" class="bg-green-500 text-white py-1 px-3 rounded">ویرایش</a>
+                <a href="#" class="bg-red-500 text-white py-1 px-3 rounded">حذف</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

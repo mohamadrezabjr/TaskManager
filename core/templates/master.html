@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% block css %}{% endblock %}">
+
+</head>
+
+<body>
+{% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                </div>
+            {% endfor %}
+
+    {% endif %}
+
+    {% block content %}
+
+    {% endblock %}
+</body>
+<script>
+    setTimeout(function() {
+        const messages = document.querySelector(".messages");
+        if (messages) {
+            messages.style.display = "none";
+        }
+    }, 5000); // بعد از 5 ثانیه پیام‌ها ناپدید می‌شوند
+</script><script>
+    setTimeout(function() {
+        const messages = document.querySelector(".messages");
+        if (messages) {
+            messages.style.display = "none";
+        }
+    }, 5000); // بعد از 5 ثانیه پیام‌ها ناپدید می‌شوند
+</script>
+</html>
