@@ -1,0 +1,31 @@
+{% extends "master.html" %}
+
+{% block title %}ورود{% endblock %}
+
+{% block css %}/static/css/auth.css{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h1>ورود</h1>
+        <p>لطفاً وارد حساب خود شوید.</p>
+
+        <form method="POST" action = {% url 'login' %}>
+            {% csrf_token %}
+
+            <label for="username">نام کاربری</label>
+            <input type="text" id="username" name="username" placeholder="نام کاربری خود را وارد کنید" required>
+
+            <label for="password">رمز عبور</label>
+            <input type="password" id="password" name="password" placeholder="رمز عبور خود را وارد کنید" required>
+
+            <button type="submit" class="btn">ورود</button>
+</form>
+            <p class="signup-link">
+                حساب کاربری ندارید؟
+                <a href="{% url 'signup' %}">ثبت‌نام کنید</a>
+            </p>
+
+    </div>
+</div>
+{% endblock %}

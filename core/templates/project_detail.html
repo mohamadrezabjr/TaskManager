@@ -1,0 +1,86 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block title %}جزئیات پروژه{% endblock %}
+{% block css%}{% static 'css/styles.css' %}{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="title">{{ project.title }}</h1>
+
+    <div class="project-details">
+        <p><strong>توضیحات:</strong> {{ project.description }}</p>
+        <p><strong>تاریخ شروع:</strong> {{ project.start_date }}</p>
+        <p><strong>تاریخ پایان:</strong> {{ project.end_date }}</p>
+        <p><strong>وضعیت:</strong> {{ project.status }}</p>
+    </div>
+
+    <div class="section">
+        <h2>اعضا</h2>
+        <ul class="members-list">
+            {% for member in members.all %}
+                <li>
+                    {{ member.username }} - {{ member.role }}
+                    <button class="btn btn-info" onclick="toggleTasks('member-{{ member.id }}')">مشاهده وظایف</button>
+                    <div id="member-{{ member.id }}" class="task-list card" style="display: none;">
+                        <ul>
+                            {% for task in member.tasks.all %}
+                                <li>{{ task.name }} </li>
+                                <li>    توضیحات :     {{ task.description }}</li>
+                            {% endfor %}
+                        </ul>
+                        <form method="POST" action="" class="task-form">
+                            {% csrf_token %}
+                            <input type = 'hidden' name="user" value={{ member }}>
+
+                            <input type="text" name="task_title" placeholder="عنوان وظیفه" required>
+                            <input type="text" name="task_description" placeholder="توضیحات" required>
+                            <button type="submit" class="btn btn-primary">افزودن وظیفه</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>دستیارها</h2>
+        <ul class="assist-list">
+            {% for assist in assistants %}
+                <li>
+                    {{ assist.username }} - {{ assist.role }}
+                    <button class="btn btn-info" onclick="toggleTasks('assist-{{ assist.id }}')">مشاهده وظایف</button>
+                    <div id="assist-{{ assist.id }}" class="task-list card" style="display: none;">
+                        <ul>
+                            {% for task in assist.tasks.all %}
+                                <li>{{ task.title }} - {{ task.status }}</li>
+                            {% endfor %}
+                        </ul>
+                        <form method="POST" action="" class="task-form">
+                            {% csrf_token %}
+                            <input type = 'hidden' name="user" value={{ member }}>
+
+                            <input type="text" name="task_description" placeholder="توضیحات" required>
+                            <input type="text" name="task_title" placeholder="عنوان وظیفه" required>
+                            <button type="submit" class="btn btn-primary">افزودن وظیفه</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <a href="" class="btn btn-success">ویرایش پروژه</a>
+    </div>
+</div>
+
+<style>
+
+</style>
+
+<script>
+function toggleTasks(id) {
+    const element = document.getElementById(id);
+    element.style.display = element.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

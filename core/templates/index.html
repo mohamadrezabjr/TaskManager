@@ -1,32 +1,39 @@
 {% extends 'master.html' %}
-    {% block title %} وظایف {% endblock %}
-    {% block css %} static/css/styles.css{% endblock %}
+
+{% block title %}Home{% endblock %}
+{% load static %}
+{% block css %} {%  static "css/styles.css" %}{% endblock %}
 {% block content %}
-    <header>
-        <h1>مدیریت وظایف</h1>
-        <nav>
-            <ul>
-                <li><a href="#">صفحه اصلی</a></li>
-
-                {% if request.user.is_authenticated %}
-                <li><a href="#">پروژه‌ها</a></li>
-                <li><a href="{% url 'logout' %}">خروج</a></li>
-                {% else %}
-                <li><a href="{% url 'signin' %}">ورود</a></li>
-                <li><a href='{% url 'signup' %}'>ثبت نام</a></li>
-                {% endif %}
-
-            </ul>
-        </nav>
+<div class="container">
+    <header class="header">
+        <h1>Welcome to Task Manager</h1>
+        <p>Manage your projects and tasks efficiently</p>
     </header>
 
-    <main>
-        <h2>به سیستم مدیریت وظایف خوش آمدید!</h2>
-        <p>این سیستم به شما کمک می‌کند پروژه‌های خود را مدیریت کنید و وظایف خود را به‌راحتی دنبال نمایید.</p>
-        <a href="#" class="btn">شروع کنید</a>
-    </main>
+    <nav class="navbar">
+        <a href="{% url 'index' %}" class="nav-link">Home</a>
+        <a href="{% url 'projects' %}" class="nav-link">Projects</a>
+        <a href="" class="nav-link">Tasks</a>
+    </nav>
 
-    <footer>
-        <p>&copy; 2025 مدیریت وظایف</p>
-    </footer>
+    <div class="action-buttons">
+        <a href="{% url 'login' %}" class="btn">Login</a>
+        <a href="{% url 'signup' %}" class="btn btn-secondary">Register</a>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h2>Project Management</h2>
+            <p>Organize your projects and assign tasks easily.</p>
+        </div>
+        <div class="feature-card">
+            <h2>Team Collaboration</h2>
+            <p>Work together with your team members efficiently.</p>
+        </div>
+        <div class="feature-card">
+            <h2>Progress Tracking</h2>
+            <p>Track your progress with real-time updates.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

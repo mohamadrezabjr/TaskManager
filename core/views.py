@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from .models import Project, Task
+from django.contrib.auth.models import User
 def index(request):
 
     return render(request,'index.html' )
@@ -26,7 +28,9 @@ def signup(request):
 
         else:
 
-            user = User.objects.create(username= username, email = email, password = password1)
+            user = User.objects.create(username= username, email = email)
+            user.set_password(password1)
+            user.save()
             messages.success(request, 'ثبت‌نام با موفقیت انجام شد.')
             log = authenticate(username= username, password = password1)
             login(request,log)
@@ -38,8 +42,8 @@ def signin(request):
 
     if request.method == 'POST':
 
-        username= request.POST.get('username')
-        password= request.POST.get('password')
+        username= request.POST['username']
+        password= request.POST['password']
 
         user= authenticate(username = username, password = password)
         login(request, user)
@@ -56,6 +60,35 @@ def logout_view(request):
 
 def test(request):
     return render(request, 'test.html')
+
+def project_list(request):
+
+    if  not request.user.is_authenticated:
+        return redirect('signin')
+    user = request.user
+
+    projects = Project.objects.filter(Q(lead = user) | Q(assist=user) | Q(member = user))
+
+    context = {'projects': projects}
+
+    return render(request, 'project_list.html', context)
+
+def project_view(request, token):
+
+    if request.method == 'POST':
+        task_title = request.POST['task_title']
+        task_description = request.POST['task_description']
+        user = User.objects.filter(username = request.POST['user']).first()
+        task_project= Project.objects.get(token=token)
+        task = Task.objects.create(name = task_title, description=task_description, user= user, project= task_project )
+        task.save()
+        return redirect('detail', token)
+    project = Project.objects.get(token=token)
+    members = project.member.all()
+    assistants = project.assist.all()
+    tasks = Task.objects.filter(project=project)
+    context = {'project':project, 'members':members, 'assistants':assistants, 'tasks':tasks}
+    return render(request, 'project_detail.html', context=context)
 
 
 
