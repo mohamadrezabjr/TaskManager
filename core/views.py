@@ -17,39 +17,24 @@ def signup(request):
         password2 = request.POST['password2']
         email = request.POST['email']
 
-
-
         if User.objects.filter(username = username).exists():
-            messages.error(request,"این نام کاربری قبلا انتخاب شده.")
+            messages.error(request,"This username is not available.")
         elif User.objects.filter(email = email).exists():
-            messages.error(request, 'این ایمیل قبلا انتخاب شده')
+            messages.error(request, 'Already registered with this email')
         elif password1 != password2 :
-            messages.error(request, 'رمز های عبور با هم مطابقت ندارند')
+            messages.error(request, 'Passwords do not match !')
 
         else:
-
             user = User.objects.create(username= username, email = email)
             user.set_password(password1)
             user.save()
-            messages.success(request, 'ثبت‌نام با موفقیت انجام شد.')
+            messages.success(request, 'Registration was successful.')
             log = authenticate(username= username, password = password1)
             login(request,log)
             return redirect('index')
-    return render(request, 'auth/signup.html')
 
-def signin(request):
+    return render(request, 'registration/signup.html')
 
-
-    if request.method == 'POST':
-
-        username= request.POST['username']
-        password= request.POST['password']
-
-        user= authenticate(username = username, password = password)
-        login(request, user)
-        return redirect('index')
-
-    return render(request, 'auth/signin.html')
 
 def logout_view(request):
     if request.user.is_authenticated:
@@ -83,6 +68,7 @@ def project_view(request, token):
         task = Task.objects.create(name = task_title, description=task_description, user= user, project= task_project )
         task.save()
         return redirect('detail', token)
+
     project = Project.objects.get(token=token)
     members = project.member.all()
     assistants = project.assist.all()

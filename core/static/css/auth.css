@@ -35,7 +35,7 @@ form {
 }
 
 label {
-    text-align: right;
+    text-align: left;
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
@@ -93,8 +93,8 @@ input:focus {
     z-index: 9999;
     text-align: center;
     padding: 15px 0;
-    background-color: rgba(0, 0, 0, 0.8); /* پس‌زمینه تیره با شفافیت */
-    color: #fff; /* متن سفید */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
 }
 
 .alert {

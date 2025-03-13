@@ -1,19 +1,25 @@
-
 from rest_framework import serializers
 from core.models import *
 from taskmanager.serializers import *
 class ProjectListSerializer(serializers.ModelSerializer):
 
-    assist = UserPublicSerializer(many = True)
-    member = UserPublicSerializer(many = True )
-    lead = UserPublicSerializer(read_only= True)
+    lead = UserPublicSerializer(read_only=True)
+    assist = serializers.SerializerMethodField()
+    member = serializers.SerializerMethodField()
+
+    def get_assist(self, obj):
+        return UserPublicSerializer(obj.assist.all(),many = True, context={'project':obj}).data
+
+
+    def get_member(self, obj):
+        return UserPublicSerializer(obj.member.all(),many = True, context={'project':obj}).data
 
     def create(self, validated_data):
 
         assists = validated_data.pop('assist')
         members = validated_data.pop('member')
-
         project = Project.objects.create(**validated_data)
+
         for user in assists:
             assist_user= User.objects.get(**user)
             project.assist.add(assist_user)
