@@ -6,7 +6,6 @@ class TaskPublicSerializer(serializers.Serializer):
     description = serializers.CharField(read_only=True)
 
 
-
 class UserPublicSerializer(serializers.Serializer):
 
     username = serializers.CharField()
@@ -14,9 +13,14 @@ class UserPublicSerializer(serializers.Serializer):
     user_tasks = serializers.SerializerMethodField(read_only=True)
 
     def get_user_tasks(self, obj):
-        user = User.objects.get(username=obj)
+        request =self.context.get('request')
         project = self.context.get('project')
-        print(project)
-        qs = Task.objects.filter(user = user, project=project)
-        print(qs)
-        return TaskPublicSerializer(qs , many=True, read_only=True).data
+
+        if request.user == project.lead or request.user == obj or request.user == project.assist:
+
+            user = User.objects.get(username=obj)
+            qs = Task.objects.filter(user = user, project=project)
+            return TaskPublicSerializer(qs , many=True, read_only=True).data
+
+        return 'You don\'t have permission'
+

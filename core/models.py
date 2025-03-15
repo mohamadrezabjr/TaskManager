@@ -21,10 +21,16 @@ class Project(models.Model):
         if not self.token:
             self.token= make_token('P',9)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name} token : {self.token}'
 class Task(models.Model ):
 
     user = models.ForeignKey(User, on_delete = models.SET_NULL, null = True, related_name='tasks')
     name = models.CharField(max_length=255)
     description = models.TextField()
     project = models.ForeignKey(Project, on_delete = models.CASCADE,related_name='tasks')
+
+    def __str__(self):
+        return f'{self.user}\'s task for Project : {self.project.name}'
 # Create your models here.
