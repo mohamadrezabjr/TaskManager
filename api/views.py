@@ -154,7 +154,7 @@ class TaskCreate(generics.CreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-    permission_classes = [IsAuthenticated, IsAssistPermission | IsLeadPer]
+    permission_classes = [IsAuthenticated, IsAssistPermission | IsLeadPermission]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
