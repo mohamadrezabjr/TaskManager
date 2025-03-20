@@ -24,6 +24,17 @@ class Project(models.Model):
 
     def __str__(self):
         return f'{self.name} token : {self.token}'
+
+    def is_lead (self, user):
+        return self.lead == user
+    def is_assist(self, user):
+        return self.assist.filter(id = user.id).exists()
+    def is_member(self, user):
+        return self.member.filter(id =user.id).exists()
+
+
+
+
 class Task(models.Model ):
 
     user = models.ForeignKey(User, on_delete = models.SET_NULL, null = True, related_name='tasks')
