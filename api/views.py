@@ -7,7 +7,8 @@ from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .permissions import IsAssistPermission, IsLeadPermission, IsMemberPermission
-
+from django.core.mail import send_mail
+from django.conf import settings
 class ProjectList(generics.ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectListSerializer
@@ -129,6 +130,10 @@ def add_assist(request, token):
             project.assist.add(user)
             project.save()
             added_num += 1
+    subject = 'hello'
+    message = 'this is a test'
+    recipient_list = ['bjr.mohamadreza@gmail.com']
+    send_mail(subject, message, 'moahamadrezabjr@gmail.com', recipient_list, fail_silently=True)
 
     return Response({'message' : f'{added_num} Assistants added successfully.',
                      'not_found_count' : len(not_found),
@@ -150,3 +155,6 @@ class TaskCreate(generics.CreateAPIView):
         project_token = self.kwargs.get('token')
         project = get_object_or_404(Project, token = project_token)
         serializer.save(project = project)
+
+
+
