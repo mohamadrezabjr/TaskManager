@@ -8,8 +8,8 @@ def make_token(type, length):
 class Project(models.Model):
 
     name = models.CharField(max_length=255)
-    lead = models.ForeignKey(User,on_delete=models.SET_NULL, null = True)
-    assist = models.ManyToManyField(User, blank = True, related_name='assist')
+    lead = models.ForeignKey(User,on_delete=models.SET_NULL, null = True,blank=True)
+    assist = models.ManyToManyField(User, blank = True, related_name='assist', )
     member = models.ManyToManyField(User, blank = True, related_name='member')
     description = models.TextField(blank = True, null = True)
     token = models.CharField(max_length=11, blank=True, null = True)

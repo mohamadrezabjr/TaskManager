@@ -8,8 +8,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .permissions import IsAssistPermission, IsLeadPermission, IsMemberPermission
 
-
-
 class ProjectList(generics.ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectListSerializer
@@ -84,26 +82,21 @@ def add_member(request, token):
     added_num = 0
     usernames = request.data.get("username")
 
-    if type(usernames) == list:
-        for username in usernames:
-            try:
-                user = User.objects.get(username=username)
-            except:
-                not_found.append(username)
-            else:
-                project.member.add(user)
-                project.save()
-                added_num += 1
+    if type(usernames) != list:
 
-    else:
+        usernames = [usernames]
+
+    for username in usernames:
         try:
-            user = User.objects.get(username=usernames)
+            user = User.objects.get(username=username)
         except:
-            not_found.append(usernames)
+            not_found.append(username)
         else:
             project.member.add(user)
             project.save()
             added_num += 1
+
+
 
     notfound_num = len(not_found)
     return Response({'message' : f'{added_num} members added successfully.',
@@ -125,26 +118,17 @@ def add_assist(request, token):
     added_num = 0
     usernames = request.data.get("username")
 
-    if type(usernames) == list:
-        for username in usernames:
-            try:
-                user = User.objects.get(username=username)
-            except:
-                not_found.append(username)
-            else:
-                project.assist.add(user)
-                project.save()
-                added_num += 1
-    else:
+    if type(usernames) != list:
+        usernames = [usernames]
+    for username in usernames:
         try:
-            user = User.objects.get(username=usernames)
+            user = User.objects.get(username=username)
         except:
-            not_found.append(usernames)
+            not_found.append(username)
         else:
             project.assist.add(user)
             project.save()
             added_num += 1
-
 
     return Response({'message' : f'{added_num} Assistants added successfully.',
                      'not_found_count' : len(not_found),

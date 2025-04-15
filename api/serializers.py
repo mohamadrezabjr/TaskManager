@@ -3,17 +3,41 @@ from rest_framework import serializers
 from core.models import *
 from taskmanager.serializers import *
 from rest_framework.reverse import reverse
+
+
+class UrlSerializer(serializers.Serializer):
+
+    edit_url =  serializers.SerializerMethodField(read_only=True)
+    add_member = serializers.SerializerMethodField(read_only=True)
+    add_assist = serializers.SerializerMethodField(read_only=True)
+    create_task = serializers.SerializerMethodField(read_only=True)
+
+    def get_edit_url(self, obj):
+        request = self.context.get('request')
+        return reverse('project_edit', kwargs = {'token' : obj.token}, request =request)
+    def get_add_member(self, obj):
+        request = self.context.get('request')
+        return reverse('add_member', kwargs = {'token' : obj.token}, request =request)
+    def get_add_assist(self, obj):
+        request = self.context.get('request')
+        return reverse('add_assist', kwargs = {'token' : obj.token}, request =request)
+    def get_create_task(self, obj):
+        request = self.context.get('request')
+        return reverse('task_create', kwargs = {'token' : obj.token}, request =request)
+
+
+
 class ProjectListSerializer(serializers.ModelSerializer):
 
     lead = serializers.SerializerMethodField()
     assist = serializers.SerializerMethodField()
     member = serializers.SerializerMethodField()
-    url = serializers.SerializerMethodField(read_only=True)
+    urls = serializers.SerializerMethodField(read_only=True)
 
-    def get_url(self, obj):
+    def get_urls(self, obj):
         request = self.context.get('request')
-        return reverse ('project_detail', kwargs = {'token' : obj.token} , request= request)
-
+        context = {'request': request}
+        return UrlSerializer(obj, context = context).data
     def get_assist(self, obj):
         context = {'request' : self.context.get('request'),'project':obj}
         return UserPublicSerializer(obj.assist.all(),many = True, context=context).data
@@ -37,9 +61,8 @@ class ProjectListSerializer(serializers.ModelSerializer):
             'lead',
             'assist',
             'member',
-            'url'
+            'urls'
         ]
-
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -74,13 +97,18 @@ class UserNameSerializer(serializers.Serializer):
         ]
 class ProjectCreateSerializer(serializers.ModelSerializer):
 
-    member = UserNameSerializer(many = True)
-    assist = UserNameSerializer(many = True)
+    member = UserNameSerializer(many = True, required = False)
+    assist = UserNameSerializer(many = True, required = False)
 
     def create(self, validated_data):
-
-        assists = validated_data.pop('assist')
-        members = validated_data.pop('member')
+        try:
+            assists = validated_data.pop('assist')
+        except KeyError:
+            assists = []
+        try :
+            members = validated_data.pop('member')
+        except KeyError :
+            members = []
         project = Project.objects.create(**validated_data)
 
         for user in assists:

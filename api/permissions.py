@@ -9,7 +9,7 @@ class IsLeadPermission(permissions.BasePermission):
         try:
             return obj.is_lead(request.user)
         except:
-            return super().has_object_permission()
+            return super().has_object_permission(request, view, obj)
 
 
     def has_permission(self, request, view):
@@ -28,7 +28,7 @@ class IsAssistPermission(permissions.BasePermission):
         try:
             return obj.is_assist(request.user)
         except:
-            return super().has_object_permission()
+            return super().has_object_permission(request, view, obj)
 
 
     def has_permission(self, request, view):

@@ -9,9 +9,9 @@ urlpatterns = [
     path ('projects/<str:token>', views.ProjectDetail.as_view(),name = 'project_detail'),
 
     path ('projects/create/', views.ProjectCreate.as_view()),
-    path ('projects/<str:token>/add_member/', views.add_member),
+    path ('projects/<str:token>/add_member/', views.add_member, name = 'add_member'),
     path ('projects/<str:token>/create_task/', views.TaskCreate.as_view(), name = 'task_create'),
-    path ('projects/<str:token>/add_assist/', views.add_assist)
+    path ('projects/<str:token>/add_assist/', views.add_assist, name = 'add_assist')
 
 
 ]
