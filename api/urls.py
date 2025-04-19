@@ -5,8 +5,8 @@ urlpatterns = [
     path('projects/', views.ProjectList.as_view(), name = 'project_list'),
     path ('auth/', obtain_auth_token),
     path ('register/', views.CreateUser.as_view()),
-    path ('projects/<str:token>/edit', views.ProjectEdit.as_view(),name = 'project_edit'),
-    path ('projects/<str:token>', views.ProjectDetail.as_view(),name = 'project_detail'),
+    path ('projects/<str:token>/edit/', views.ProjectEdit.as_view(),name = 'project_edit'),
+    path ('projects/<str:token>/', views.ProjectDetail.as_view(),name = 'project_detail'),
 
     path ('projects/create/', views.ProjectCreate.as_view()),
     path ('projects/<str:token>/add_member/', views.add_member, name = 'add_member'),
