@@ -1,7 +1,12 @@
+import time
+from .tasks import send_task_create_email
+
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.vary import vary_on_headers
 from rest_framework import generics, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from core.models import *
+from core.views import project_list
 from .serializers import *
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
@@ -9,9 +14,19 @@ from rest_framework.response import Response
 from .permissions import IsAssistPermission, IsLeadPermission, IsMemberPermission
 from django.core.mail import send_mail
 from django.conf import settings
+
+#cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
 class ProjectList(generics.ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectListSerializer
+
+    @method_decorator(cache_page(60*3, key_prefix = project_list))
+    @method_decorator(vary_on_headers("Authorization"))
+    def list(self, request, *args, **kwargs):
+        return super(ProjectList, self).list(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(lead=self.request.user)
@@ -95,8 +110,6 @@ def add_member(request, token):
     for username in usernames:
         try:
             user = User.objects.get(username=username)
-
-
         except:
             not_found.append(username)
         else:
@@ -110,10 +123,7 @@ def add_member(request, token):
                 already_member.append(username)
 
     url = reverse('project_detail', kwargs = {'token' : token}, request =request)
-    subject = 'You invited to a project! '
-    message = f'The user {lead.username} invited you to the ({project.name}) project as an a member. \n You can see the project in this link : {url}'
-
-    send_mail(subject, message, 'moahamadrezabjr@gmail.com', recipient_list, fail_silently=False)
+    send_task_create_email.delay(lead =lead.username,recipient_list = recipient_list ,project_name = project.name,url =url,as_who = 'member')
 
 
     return Response({'message' : f'{added_num} members added successfully.',
@@ -160,11 +170,8 @@ def add_assist(request, token):
                 already_assist.append(username)
 
     url = reverse('project_detail', kwargs = {'token' : token}, request =request)
-    subject = 'You invited to a project! '
-    message = f'The user {lead.username} invited you to the ({project.name}) project as an assist. \n You can see the project in this link : {url}'
 
-
-    send_mail(subject, message, 'moahamadrezabjr@gmail.com', recipient_list, fail_silently=False)
+    send_task_create_email.delay(lead =lead.username,recipient_list = recipient_list ,project_name = project.name,url =url,as_who = 'assistant')
 
     return Response({'message' : f'{added_num} Assistants added successfully.',
                      'not_found_count' : len(not_found),

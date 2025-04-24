@@ -143,7 +143,15 @@ REST_FRAMEWORK = {
 
 LOGIN_REDIRECT_URL = '/'
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
 # Email setup
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
