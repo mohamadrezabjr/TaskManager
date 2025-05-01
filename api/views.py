@@ -1,6 +1,10 @@
 import time
-from .tasks import send_task_create_email
 
+from django.dispatch import receiver
+
+from .tasks import send_task_create_email,  one_day
+
+from datetime import datetime , timedelta
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.vary import vary_on_headers
 from rest_framework import generics, mixins, status
@@ -19,6 +23,8 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
+
+#api/projects
 class ProjectList(generics.ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectListSerializer
@@ -31,7 +37,9 @@ class ProjectList(generics.ListAPIView):
     def perform_create(self, serializer):
         serializer.save(lead=self.request.user)
 
+
     def get_queryset(self, *args, **kwargs):
+
         qs = super().get_queryset(*args, **kwargs)
         user = self.request.user
         return qs.filter(Q(lead=user) | Q(member=user) | Q(assist=user)).distinct()
@@ -41,7 +49,7 @@ class ProjectList(generics.ListAPIView):
         context['request'] = self.request
 
         return context
-
+#api/projects/<token>/
 class ProjectDetail(generics.RetrieveAPIView):
 
     queryset = Project.objects.all()
@@ -49,20 +57,40 @@ class ProjectDetail(generics.RetrieveAPIView):
     lookup_field = 'token'
     permission_classes = [IsAuthenticated, IsLeadPermission | IsAssistPermission | IsMemberPermission]
 
+#api/register/
 class CreateUser(generics.CreateAPIView):
     model = User
     serializer_class = UserSerializer
     authentication_classes = []
     permission_classes = []
 
-
+#api/create_project
 class ProjectCreate(generics.CreateAPIView):
     model = Project
     serializer_class = ProjectCreateSerializer
+
     def perform_create(self, serializer):
+
+
         serializer.save(lead=self.request.user)
 
+        project_name = serializer.validated_data['name']
+        deadline = serializer.validated_data['deadline']
+        member = serializer.validated_data.get("member_usernames")
+        assist = serializer.validated_data.get("assist_usernames")
+        if not assist:
+            assist=[]
+        if not member:
+            member=[]
 
+        receivers = assist+member
+
+        one_day_left = deadline - timedelta(days = 1)
+
+        one_day.apply_async(eta = one_day_left, kwargs = {"project_name": project_name, "deadline": deadline, "receivers" :receivers})
+
+
+#api/projects/<token>/edit/
 class ProjectEdit(generics.GenericAPIView,
                   mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
@@ -83,7 +111,7 @@ class ProjectEdit(generics.GenericAPIView,
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
-
+#api/projects/<token>/add_member/
 @api_view(['POST'])
 def add_member(request, token):
 
@@ -93,6 +121,7 @@ def add_member(request, token):
         lead = project.lead
     except :
         return Response ({'error' : 'Project not found!'}, status = status.HTTP_404_NOT_FOUND)
+    #just leader can add member
     if project.lead != request.user :
         return Response({'error' : "You don't have permission to add members."}, status = status.HTTP_400_BAD_REQUEST)
 
@@ -102,6 +131,7 @@ def add_member(request, token):
     already_member = []
     usernames = request.data.get("username")
 
+    #get one user or a list of users . for example : {"username":"blabla"} or {"username" : ["blabla1","blabla2"]}
     if type(usernames) != list:
 
         usernames = [usernames]
@@ -132,6 +162,7 @@ def add_member(request, token):
                      'These users are already member in this project : ' : already_member},
                       status = status.HTTP_200_OK)
 
+#api/projects/<token>/add_assist/
 @api_view(['POST'])
 def add_assist(request, token):
 
@@ -150,6 +181,7 @@ def add_assist(request, token):
     usernames = request.data.get("username")
     already_assist = []
 
+    # get one user or a list of users . for example : {"username":"blabla"} or {"username" : ["blabla1","blabla2"]}
     if type(usernames) != list:
         usernames = [usernames]
     recipient_list = []
@@ -179,6 +211,7 @@ def add_assist(request, token):
                      'These users are already assist in this project : ' : already_assist},
                      status = status.HTTP_200_OK)
 
+#api/projects/<token>/create_task/
 class TaskCreate(generics.CreateAPIView):
 
     queryset = Task.objects.all()

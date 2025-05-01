@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-l-2)(&8@7jh73^(e-oz27(!0uu4a$idr1@$u40-cau*2yanucg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'django_celery_beat',
 
     'core',
     'api'
@@ -114,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -152,6 +153,8 @@ CACHES = {
 
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
 CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = 'Asia/Tehran'
 # Email setup
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

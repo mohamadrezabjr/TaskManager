@@ -13,8 +13,8 @@ class Project(models.Model):
     member = models.ManyToManyField(User, blank = True, related_name='member')
     description = models.TextField(blank = True, null = True)
     token = models.CharField(max_length=11, blank=True, null = True)
-    start = models.DateField()
-    deadline = models.DateField()
+    start = models.DateTimeField()
+    deadline = models.DateTimeField()
 
     def save(self, *args, **kwargs):
 

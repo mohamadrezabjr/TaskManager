@@ -86,37 +86,34 @@ class UserSerializer(serializers.ModelSerializer):
             'password'
         ]
 
-class UserNameSerializer(serializers.Serializer):
 
-    username = serializers.CharField()
-
-    class Meta:
-        model = User
-        fields = [
-            'username'
-        ]
 class ProjectCreateSerializer(serializers.ModelSerializer):
 
-    member = UserNameSerializer(many = True, required = False)
-    assist = UserNameSerializer(many = True, required = False)
+    member_usernames = serializers.ListSerializer(child=serializers.CharField(), required = False)
+    assist_usernames = serializers.ListSerializer(child=serializers.CharField(),required=False)
 
     def create(self, validated_data):
         try:
-            assists = validated_data.pop('assist')
+            assists = validated_data.pop('assist_usernames')
         except KeyError:
             assists = []
         try :
-            members = validated_data.pop('member')
+            members = validated_data.pop('member_usernames')
         except KeyError :
             members = []
         project = Project.objects.create(**validated_data)
 
+        #geting back data for views like : ProjectCreate
+        validated_data["assist_usernames"] = assists
+        validated_data["member_usernames"] = members
+
+        #adding members and assists
         for user in assists:
-            assist_user= User.objects.get(**user)
+            assist_user= User.objects.get(username = user )
             project.assist.add(assist_user)
 
         for user in members:
-            member_user= User.objects.get(**user)
+            member_user= User.objects.get(username = user)
             project.member.add(member_user)
 
         project.save()
@@ -128,8 +125,8 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         fields = [
             'name',
             'description',
-            'assist',
-            'member',
+            'assist_usernames',
+            'member_usernames',
             'start',
             'deadline'
         ]
